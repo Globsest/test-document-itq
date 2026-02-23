@@ -149,18 +149,14 @@ public class DocumentStatusService {
                         .build();
             }
 
-            // Переводим в APPROVED
             document.setStatus(DocumentStatus.APPROVED);
             documentRepository.save(document);
 
-            // Сохраняем в историю
             historyService.addHistoryEntry(document, DocumentAction.APPROVE, initiator, comment);
 
-            // Создаем запись в реестре утверждений
             try {
                 registryService.createRegistryEntry(id, initiator);
             } catch (Exception e) {
-                // Если не удалось создать запись в реестре - откатываем транзакцию
                 log.error("Ошибка создания записи в реестре для документа {}: {}", id, e.getMessage());
                 throw new ApprovalRegistryException("Не удалось создать запись в реестре утверждений: " + e.getMessage(), e);
             }
@@ -180,7 +176,6 @@ public class DocumentStatusService {
                     .errorMessage(e.getMessage())
                     .build();
         } catch (ApprovalRegistryException e) {
-            // Транзакция откатится автоматически благодаря @Transactional
             log.error("Ошибка реестра утверждений для документа {}: {}", id, e.getMessage());
             return BatchOperationResult.builder()
                     .id(id)
