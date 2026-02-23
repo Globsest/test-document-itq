@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-document-history-table" author="system">
+        <createSequence sequenceName="history_seq" startValue="1" incrementBy="1"/>
+
+        <createTable tableName="document_history">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="document_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="performed_by" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="performed_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="VARCHAR(1000)"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="document_history"
+                baseColumnNames="document_id"
+                constraintName="fk_history_document"
+                referencedTableName="documents"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_history_document_id" tableName="document_history">
+            <column name="document_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_history_performed_at" tableName="document_history">
+            <column name="performed_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
