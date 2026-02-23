@@ -60,14 +60,12 @@ public class DocumentController {
             @RequestParam(required = false) List<Long> ids) {
         
         if (ids != null && !ids.isEmpty()) {
-            // Пакетное получение
             List<Document> documents = documentService.getDocumentsByIds(ids);
             List<DocumentResponse> responses = documents.stream()
                     .map(DocumentResponse::fromEntity)
                     .collect(Collectors.toList());
             return ResponseEntity.ok(responses);
         } else {
-            // Если ids не указаны, возвращаем пустой список или можно вернуть ошибку
             return ResponseEntity.ok(List.of());
         }
     }

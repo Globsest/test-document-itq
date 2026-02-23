@@ -54,15 +54,12 @@ class DocumentStatusServiceTest {
 
     @Test
     void testSubmitDocuments_Success() {
-        // Given
         List<Long> ids = Arrays.asList(1L);
         when(documentRepository.findById(1L)).thenReturn(Optional.of(draftDocument));
         when(documentRepository.save(any(Document.class))).thenReturn(draftDocument);
 
-        // When
         BatchOperationResponse response = statusService.submitDocuments(ids, "admin", "Комментарий");
 
-        // Then
         assertEquals(1, response.getTotalCount());
         assertEquals(1, response.getSuccessCount());
         assertEquals(0, response.getFailureCount());
@@ -73,14 +70,14 @@ class DocumentStatusServiceTest {
 
     @Test
     void testSubmitDocuments_NotFound() {
-        // Given
+
         List<Long> ids = Arrays.asList(999L);
         when(documentRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // When
+
         BatchOperationResponse response = statusService.submitDocuments(ids, "admin", null);
 
-        // Then
+
         assertEquals(1, response.getTotalCount());
         assertEquals(0, response.getSuccessCount());
         assertEquals(1, response.getFailureCount());
@@ -90,16 +87,16 @@ class DocumentStatusServiceTest {
 
     @Test
     void testApproveDocuments_Success() {
-        // Given
+
         List<Long> ids = Arrays.asList(2L);
         when(documentRepository.findById(2L)).thenReturn(Optional.of(submittedDocument));
         when(documentRepository.save(any(Document.class))).thenReturn(submittedDocument);
         when(registryService.createRegistryEntry(anyLong(), any())).thenReturn(null);
 
-        // When
+
         BatchOperationResponse response = statusService.approveDocuments(ids, "admin", "Комментарий");
 
-        // Then
+
         assertEquals(1, response.getTotalCount());
         assertEquals(1, response.getSuccessCount());
         assertEquals(0, response.getFailureCount());
@@ -111,17 +108,17 @@ class DocumentStatusServiceTest {
 
     @Test
     void testApproveDocuments_RegistryError_Rollback() {
-        // Given
+
         List<Long> ids = Arrays.asList(2L);
         when(documentRepository.findById(2L)).thenReturn(Optional.of(submittedDocument));
         when(documentRepository.save(any(Document.class))).thenReturn(submittedDocument);
         when(registryService.createRegistryEntry(anyLong(), any()))
                 .thenThrow(new ApprovalRegistryException("Ошибка создания записи"));
 
-        // When
+
         BatchOperationResponse response = statusService.approveDocuments(ids, "admin", null);
 
-        // Then
+
         assertEquals(1, response.getTotalCount());
         assertEquals(0, response.getSuccessCount());
         assertEquals(1, response.getFailureCount());
@@ -132,7 +129,7 @@ class DocumentStatusServiceTest {
 
     @Test
     void testApproveDocuments_PartialResults() {
-        // Given
+
         List<Long> ids = Arrays.asList(2L, 999L, 3L);
         
         Document submittedDoc2 = new Document();
@@ -146,15 +143,13 @@ class DocumentStatusServiceTest {
         when(documentRepository.save(any(Document.class))).thenReturn(submittedDocument);
         when(registryService.createRegistryEntry(anyLong(), any())).thenReturn(null);
 
-        // When
         BatchOperationResponse response = statusService.approveDocuments(ids, "admin", null);
 
-        // Then
         assertEquals(3, response.getTotalCount());
         assertEquals(2, response.getSuccessCount());
         assertEquals(1, response.getFailureCount());
-        assertTrue(response.getResults().get(0).isSuccess()); // ID 2L
-        assertFalse(response.getResults().get(1).isSuccess()); // ID 999L - не найден
-        assertTrue(response.getResults().get(2).isSuccess()); // ID 3L
+        assertTrue(response.getResults().get(0).isSuccess());
+        assertFalse(response.getResults().get(1).isSuccess());
+        assertTrue(response.getResults().get(2).isSuccess());
     }
 }

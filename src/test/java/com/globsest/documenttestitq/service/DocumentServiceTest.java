@@ -37,7 +37,6 @@ class DocumentServiceTest {
 
     @Test
     void testCreateDocument_Success() {
-        // Given
         String author = "Иванов И.И.";
         String title = "Тестовый документ";
         String initiator = "admin";
@@ -51,10 +50,8 @@ class DocumentServiceTest {
 
         when(documentRepository.save(any(Document.class))).thenReturn(savedDocument);
 
-        // When
         Document result = documentService.createDocument(author, title, initiator);
 
-        // Then
         assertNotNull(result);
         assertEquals(author, result.getAuthor());
         assertEquals(title, result.getTitle());

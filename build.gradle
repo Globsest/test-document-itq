@@ -39,9 +39,20 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+    systemProperty 'spring.profiles.active', 'test'
+}
+
+tasks.register('runGenerator', JavaExec) {
+    group = 'application'
+    description = 'Запуск массового создания документов '
+    mainClass = 'com.globsest.documenttestitq.generator.DocumentGeneratorRunner'
+    classpath = sourceSets.main.runtimeClasspath
 }

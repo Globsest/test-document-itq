@@ -52,4 +52,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
     );
 
     List<Document> findByStatusOrderByIdAsc(DocumentStatus status, Pageable pageable);
+
+    long countByStatus(DocumentStatus status);
 }

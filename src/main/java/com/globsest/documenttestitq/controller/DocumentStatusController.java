@@ -1,6 +1,7 @@
 package com.globsest.documenttestitq.controller;
 
 import com.globsest.documenttestitq.dto.*;
+import com.globsest.documenttestitq.service.ConcurrentApprovalService;
 import com.globsest.documenttestitq.service.DocumentStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class DocumentStatusController {
 
     private final DocumentStatusService statusService;
+    private final ConcurrentApprovalService concurrentApprovalService;
 
     @PostMapping("/submit")
     public ResponseEntity<BatchOperationResponse> submitDocuments(
@@ -53,15 +55,12 @@ public class DocumentStatusController {
         log.info("Тест конкурентного утверждения: documentId={}, threads={}, attempts={}", 
                 request.getDocumentId(), request.getThreads(), request.getAttempts());
         
-        // TODO: Реализовать в День 2
-        // Пока возвращаем заглушку
-        ConcurrentApprovalTestResponse response = ConcurrentApprovalTestResponse.builder()
-                .documentId(request.getDocumentId())
-                .totalAttempts(0)
-                .successCount(0)
-                .conflictCount(0)
-                .errorCount(0)
-                .build();
+        ConcurrentApprovalTestResponse response = concurrentApprovalService.runConcurrentApprovalTest(
+                request.getDocumentId(),
+                request.getThreads(),
+                request.getAttempts(),
+                request.getInitiator()
+        );
 
         return ResponseEntity.ok(response);
     }

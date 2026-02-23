@@ -1,41 +1,50 @@
 package com.globsest.documenttestitq.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.globsest.documenttestitq.dto.CreateDocumentRequest;
 import com.globsest.documenttestitq.entity.Document;
 import com.globsest.documenttestitq.entity.DocumentStatus;
 import com.globsest.documenttestitq.service.DocumentService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(DocumentController.class)
+@ExtendWith(MockitoExtension.class)
 class DocumentControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private DocumentService documentService;
+
+    @InjectMocks
+    private DocumentController documentController;
+
+    private final tools.jackson.databind.ObjectMapper objectMapper = new tools.jackson.databind.ObjectMapper();
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(documentController).build();
+    }
 
     @Test
     void testCreateDocument_Success() throws Exception {
-        // Given
         CreateDocumentRequest request = new CreateDocumentRequest();
         request.setAuthor("Иванов И.И.");
         request.setTitle("Тестовый документ");
@@ -52,7 +61,6 @@ class DocumentControllerTest {
 
         when(documentService.createDocument(any(), any(), any())).thenReturn(document);
 
-        // When & Then
         mockMvc.perform(post("/api/documents")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -66,7 +74,6 @@ class DocumentControllerTest {
 
     @Test
     void testGetDocument_Success() throws Exception {
-        // Given
         Long documentId = 1L;
         Document document = new Document();
         document.setId(documentId);
@@ -80,7 +87,6 @@ class DocumentControllerTest {
         when(documentService.getDocumentById(documentId)).thenReturn(document);
         when(documentService.getDocumentHistory(documentId)).thenReturn(Collections.emptyList());
 
-        // When & Then
         mockMvc.perform(get("/api/documents/{id}", documentId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(documentId))
