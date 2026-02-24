@@ -1,9 +1,11 @@
 package com.globsest.documenttestitq.service;
 
 import com.globsest.documenttestitq.entity.ApprovalRegistry;
+import com.globsest.documenttestitq.exception.RegistryAlreadyExistsException;
 import com.globsest.documenttestitq.repository.ApprovalRegistryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +29,17 @@ public class ApprovalRegistryService {
         registry.setApprovedAt(LocalDateTime.now());
         registry.setApprovedBy(approvedBy);
 
-        ApprovalRegistry saved = registryRepository.save(registry);
-        log.info("Создана запись в реестре утверждений для документа {}", documentId);
-        return saved;
+        try {
+            ApprovalRegistry saved = registryRepository.save(registry);
+            log.info("Создана запись в реестре утверждений для документа {}", documentId);
+            return saved;
+        } catch (DataIntegrityViolationException e) {
+            String msg = e.getMessage() != null ? e.getMessage() : "";
+            if (msg.contains("duplicate key") || msg.contains("unique constraint") || msg.contains("document_id")) {
+                throw new RegistryAlreadyExistsException("Запись в реестре для документа " + documentId + " уже существует", e);
+            }
+            throw e;
+        }
     }
 
     @Transactional
