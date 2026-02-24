@@ -3,6 +3,7 @@ package com.globsest.documenttestitq.service;
 import com.globsest.documenttestitq.dto.BatchOperationResult;
 import com.globsest.documenttestitq.dto.BatchOperationResponse;
 import com.globsest.documenttestitq.exception.ApprovalRegistryException;
+import com.globsest.documenttestitq.exception.RegistryAlreadyExistsException;
 import com.globsest.documenttestitq.exception.DocumentNotFoundException;
 import com.globsest.documenttestitq.exception.InvalidStatusTransitionException;
 import com.globsest.documenttestitq.entity.Document;
@@ -156,6 +157,8 @@ public class DocumentStatusService {
 
             try {
                 registryService.createRegistryEntry(id, initiator);
+            } catch (RegistryAlreadyExistsException e) {
+                throw e;
             } catch (Exception e) {
                 log.error("Ошибка создания записи в реестре для документа {}: {}", id, e.getMessage());
                 throw new ApprovalRegistryException("Не удалось создать запись в реестре утверждений: " + e.getMessage(), e);

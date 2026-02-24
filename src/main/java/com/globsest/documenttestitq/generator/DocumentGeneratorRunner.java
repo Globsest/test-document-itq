@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * Утилита массового создания документов через API сервиса.
- * Читает параметр count из generator.properties (или из classpath).
- * Запуск: gradlew runGenerator или из IDE указать main class DocumentGeneratorRunner.
- */
+//Читает параметр count из generator.properties.
+// Запуск: gradlew runGenerator или из IDE указать main class DocumentGeneratorRunner.
 public class DocumentGeneratorRunner {
 
     private static final String DEFAULT_PROPERTIES = "generator.properties";

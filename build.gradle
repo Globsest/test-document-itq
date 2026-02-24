@@ -52,7 +52,8 @@ tasks.named('test') {
 
 tasks.register('runGenerator', JavaExec) {
     group = 'application'
-    description = 'Запуск массового создания документов '
+    description = 'Запуск массового создания документов'
     mainClass = 'com.globsest.documenttestitq.generator.DocumentGeneratorRunner'
     classpath = sourceSets.main.runtimeClasspath
+    jvmArgs '-Dfile.encoding=UTF-8'
 }
